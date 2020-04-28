@@ -13,6 +13,7 @@ app.url_map.strict_slashes = False
 host = os.getenv('HBNB_API_HOST', '0.0.0.0')
 port = os.getenv('HBNB_API_PORT', 5000)
 
+
 @app.teardown_appcontext
 def app_context(close):
     '''calls storage.close(). It is called after each request'''
