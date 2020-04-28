@@ -5,11 +5,11 @@ from flask import jsonify
 from models import storage
 
 
-
 @app_views.route('/status')
 def status():
     '''Return status (json format) of the object app_views'''
     return jsonify({'status': 'OK'})
+
 
 @app_views.route('/stats', methods=['GET'])
 def get_stats():
