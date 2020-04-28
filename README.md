@@ -1,4 +1,9 @@
 # AirBnB Clone - The Console
+
+
+First of all, what is AirBnb?
+Airbnb is an online marketplace that connects people who want to rent out their homes with people who are looking for accommodations in that locale. ... For hosts, participating in Airbnb is a way to earn some income from their property, but with the risk that the guest might do damage to it.
+
 The console is the first segment of the AirBnB project at Holberton School that will collectively cover fundamental concepts of higher level programming. The goal of AirBnB project is to eventually deploy our server a simple copy of the AirBnB Website(HBnB). A command interpreter is created in this segment to manage objects for the AirBnB(HBnB) website.
 
 #### Functionalities of this command interpreter:
@@ -156,6 +161,8 @@ No known bugs at this time.
 ## Authors
 Alexa Orrico - [Github](https://github.com/alexaorrico) / [Twitter](https://twitter.com/alexa_orrico)  
 Jennifer Huang - [Github](https://github.com/jhuang10123) / [Twitter](https://twitter.com/earthtojhuang)
+Diego Betancourt - [Github](https://github.com/dfbq91) / [Twitter](https://twitter.com/diegobtancourt)
+Diego Quijano - [Github](https://github.com/diego0096) / [Twitter](https://twitter.com/DiegoQ0096)
 
 Second part of Airbnb: Joann Vuong
 ## License
