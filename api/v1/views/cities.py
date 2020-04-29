@@ -7,7 +7,7 @@ from models.city import City
 
 
 @app_views.route('/states/<state_id>/cities', methods=['GET', 'POST'])
-def get_cities(state_id=None):
+def get_post_cities(state_id=None):
     '''GET: Return json list of all City objects of a State
        POST: Create a new city object for a state with a given state_id
 
@@ -41,10 +41,12 @@ def get_cities(state_id=None):
         storage.save()
         return make_response(jsonify(new_city.to_dict()), 201)
 
-@app_views.route('/cities/<city_id>', methods=['GET', 'DELETE'])
-def get_or_delete_city(city_id):
+
+@app_views.route('/cities/<city_id>', methods=['GET', 'DELETE', 'PUT'])
+def get_delete_put_city(city_id):
     '''GET: Return json City object that belongs to the given city_id
-       DELETE: Delete a city object that belongs to the given city id'''
+       DELETE: Delete a city object that belongs to the given city id
+       PUT: Update a City object that belongs to the given city id'''
     city_obj = storage.get("City", city_id)
     if city_obj is None:
         return abort(404, description="Not found")
@@ -54,7 +56,17 @@ def get_or_delete_city(city_id):
         for city in all_cities:
             if city.id == city_id:
                 return jsonify(city.to_dict())
+
     elif request.method == 'DELETE':
         city_obj.delete()
         storage.save()
         return make_response(jsonify({}), 200)
+
+    elif request.method == 'PUT':
+        if not request.get_json():
+            abort(400, "Not a JSON")
+        for attr, value in request.get_json().items():
+            if attr not in ['id', 'state_id', 'created_at', 'updated_at']:
+                setattr(city_obj, attr, value)
+        city_obj.save()
+        return make_response(jsonify(city_obj.to_dict()), 200)
