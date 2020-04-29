@@ -7,7 +7,7 @@ from models.state import State
 
 
 @app_views.route('/states', methods=['GET'], strict_slashes=False)
-def states():
+def get_states():
     """ Retrieves the list of all objects """
     d_states = storage.all(State)
     return jsonify([obj.to_dict() for obj in d_states.values()])
@@ -24,7 +24,7 @@ def r_state_id(state_id):
 
 @app_views.route('/states/<state_id>', methods=['DELETE'],
                  strict_slashes=False)
-def del_state(state_id):
+def delete_state(state_id):
     """ Deletes an object """
     state = storage.get("State", state_id)
     if not state:
