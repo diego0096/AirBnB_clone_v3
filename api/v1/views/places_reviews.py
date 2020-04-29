@@ -11,18 +11,18 @@ from models.review import Review
                  strict_slashes=False)
 def get_reviews_by_place(place_id):
     """ Retrieves the list of all objects """
-    place_obj = storage.get("Place", place_id).reviews
+    place_obj = storage.get("Place", place_id)
     if place_obj is None:
         abort(404)
 
     if request.method == 'GET':
         review_list = []
-        for review in place_obj:
+        for review in place_obj.reviews:
             review_list.append(review.to_dict())
         return jsonify(review_list)
 
     if request.method == 'POST':
-        review_request = request.get_json
+        review_request = request.get_json()
         if review_request is None:
             return make_response(jsonify({'error': 'Not a JSON'}), 400)
         if 'user_id' not in review_request:
@@ -50,7 +50,7 @@ def get_review(review_id):
         return jsonify(review_obj.to_dict())
 
     if request.method == 'DELETE':
-        storage.delete(review_obj)
+        review_obj.delete()
         storage.save()
         return jsonify({}), 200
 
