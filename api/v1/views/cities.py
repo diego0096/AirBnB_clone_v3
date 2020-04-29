@@ -16,12 +16,14 @@ def get_post_cities(state_id=None):
     - all_cities: list of all cities objects with their attributes
     - cities: list to jsonify. Is the return of this method'''
 
-    state_obj = storage.get("State", state_id)
+    state_obj = storage.get("State", state_id).cities
     if state_obj is None:
         return abort(404, description="Not found")
     if request.method == 'GET':
-        d_cities = storage.all(City)
-        return jsonify([obj.to_dict() for obj in d_cities.values()])
+        cities_list = []
+        for city in state_obj:
+            cities_list.append(city.to_dict())
+        return jsonify(cities_list)
 
     elif request.method == 'POST':
         city_request = request.get_json()
