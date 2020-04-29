@@ -1,13 +1,9 @@
 #!/usr/bin/python3
 '''View for City objects that handles all default RestFul API actions'''
 from api.v1.views import app_views
-from flask import abort, jsonify, make_response, request, Flask
+from flask import abort, jsonify, make_response, request
 from models import storage
 from models.city import City
-
-
-app = Flask('my_app')
-app.url_map.strict_slashes = False
 
 
 @app_views.route('/states/<state_id>/cities', methods=['GET', 'POST'])
@@ -23,14 +19,9 @@ def get_post_cities(state_id=None):
     state_obj = storage.get("State", state_id)
     if state_obj is None:
         return abort(404, description="Not found")
-
     if request.method == 'GET':
-        all_cities = storage.all("City").values()
-        cities = []
-        for city in all_cities:
-            if city.state_id == state_id:
-                cities.append(city.to_dict())
-        return jsonify(cities)
+        d_cities = storage.all(City)
+        return jsonify([obj.to_dict() for obj in d_cities.values()])
 
     elif request.method == 'POST':
         city_request = request.get_json()
