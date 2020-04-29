@@ -1,9 +1,13 @@
 #!/usr/bin/python3
 '''View for City objects that handles all default RestFul API actions'''
 from api.v1.views import app_views
-from flask import abort, jsonify, make_response, request
+from flask import abort, jsonify, make_response, request, Flask
 from models import storage
 from models.city import City
+
+
+app = Flask('my_app')
+app.url_map.strict_slashes = False
 
 
 @app_views.route('/states/<state_id>/cities', methods=['GET', 'POST'])
@@ -30,7 +34,7 @@ def get_post_cities(state_id=None):
 
     elif request.method == 'POST':
         city_request = request.get_json()
-        if city_request is None:
+        if request.get_json() is None:
             abort(400, "Not a JSON")
         if city_request.get("name") is None:
             abort(400, "Missing name")
@@ -63,7 +67,8 @@ def get_delete_put_city(city_id):
         return make_response(jsonify({}), 200)
 
     elif request.method == 'PUT':
-        if not request.get_json():
+        if request.get_json() is None:
+            print(request.get_json())
             abort(400, "Not a JSON")
         for attr, value in request.get_json().items():
             if attr not in ['id', 'state_id', 'created_at', 'updated_at']:
