@@ -1,47 +1,85 @@
 #!/usr/bin/python3
-"""City related end points"""
+""" View for Place objects that makes API actions """
 from api.v1.views import app_views
-from api.v1.views import *
-from flask import jsonify, make_response, abort, request
+from flask import jsonify, abort, make_response, request
 from models import storage
+import requests
+import json
+from os import getenv
 from models.place import Place
 
-model = "Place"
-parent_model = "City"
 
-
-@app_views.route("/cities/<city_id>/places", strict_slashes=False,
-                 methods=["GET"])
+@app_views.route('/cities/<city_id>/places', methods=['GET'],
+                 strict_slashes=False)
 def get_places(city_id):
-    """getting /city api way"""
-    return get_models(parent_model, city_id, "places")
+    """ Retrieves the list of all objects """
+    city = storage.get("City", city_id)
+    if not city:
+        abort(404)
+    return jsonify([place.to_dict() for place in city.places])
 
 
-@app_views.route("/places/<place_id>", strict_slashes=False,
-                 methods=["GET"])
-def get_place(place_id):
-    """getting /place api way"""
-    return get_model(model, place_id)
+@app_views.route('/places/<place_id>', methods=['GET'], strict_slashes=False)
+def r_place_id(place_id):
+    """ Retrieves an object """
+    place = storage.get("Place", place_id)
+    if not place:
+        abort(404)
+    return jsonify(place.to_dict())
 
 
-@app_views.route("/places/<place_id>", strict_slashes=False,
-                 methods=["DELETE"])
+@app_views.route('/places/<place_id>', methods=['DELETE'],
+                 strict_slashes=False)
 def delete_place(place_id):
-    """deletting /place api way"""
-    return delete_model(model, place_id)
+    """ Deletes an object """
+    place = storage.get("Place", place_id)
+    if not place:
+        abort(404)
+    place.delete()
+    storage.save()
+    return make_response(jsonify({}), 200)
 
 
-@app_views.route("/cities/<city_id>/places", strict_slashes=False,
-                 methods=["POST"])
+@app_views.route('/cities/<city_id>/places', methods=['POST'],
+                 strict_slashes=False)
 def post_place(city_id):
-    """posting /places api way"""
-    required_data = {"name", "user_id"}
-    return post_model(model, parent_model, city_id, required_data)
+    """ Creates an object """
+    city = storage.get("City", city_id)
+    if not city:
+        abort(404)
+    new_place = request.get_json()
+    if not new_place:
+        abort(400, "Not a JSON")
+    if "user_id" not in new_place:
+        abort(400, "Missing user_id")
+    user_id = new_place['user_id']
+    if not storage.get("User", user_id):
+        abort(404)
+    if "name" not in new_place:
+        abort(400, "Missing name")
+    place = Place(**new_place)
+    setattr(place, 'city_id', city_id)
+    storage.new(place)
+    storage.save()
+    return make_response(jsonify(place.to_dict()), 201)
 
 
-@app_views.route("/places/<place_id>", strict_slashes=False,
-                 methods=["PUT"])
+@app_views.route('/places/<place_id>', methods=['PUT'],
+                 strict_slashes=False)
 def put_place(place_id):
-    """putting /places api way"""
-    ignore_data = ["id", "created_at", "updated_at", "user_id", "city_id"]
-    return put_model(model, place_id, ignore_data)
+    """ Updates an object """
+    place = storage.get("Place", place_id)
+    if not place:
+        abort(404)
+
+    body_request = request.get_json()
+    if not body_request:
+        abort(400, "Not a JSON")
+
+    for k, v in body_request.items():
+        if k not in ['id', 'user_id', 'city_at',
+                     'created_at', 'updated_at']:
+            setattr(place, k, v)
+
+    storage.save()
+    return make_response(jsonify(place.to_dict()), 200)
